@@ -12,7 +12,19 @@ public class SpringCloudConfig {
     public RouteLocator gatewayRoutes(RouteLocatorBuilder builder) {
         return builder.routes()
                 // ----------------------------------------------------
-                // 1. MICROSERVICIO DE USUARIOS
+                // 1. MICROSERVICIO DE NOTIFICACIONES
+                // ----------------------------------------------------
+                .route("notification-service", r -> r.path(
+                        "/api/me/notifications/**" // NotificationController
+                    )
+                        .filters(f -> f
+                                .stripPrefix(1)
+                                .tokenRelay()
+                        )
+                        .uri("lb://NOTIFICATION-SERVICE"))        
+        
+                // ----------------------------------------------------
+                // 2. MICROSERVICIO DE USUARIOS
                 // ----------------------------------------------------
                 .route("user-service", r -> r.path(
                         "/api/admin/users/**", // AdminUserController
@@ -24,18 +36,6 @@ public class SpringCloudConfig {
                                 .tokenRelay()
                         )
                         .uri("lb://USER-SERVICE"))
-
-                // ----------------------------------------------------
-                // 2. MICROSERVICIO DE NOTIFICACIONES
-                // ----------------------------------------------------
-                .route("notification-service", r -> r.path(
-                        "/api/notifications/**" // NotificationController
-                    )
-                        .filters(f -> f
-                                .stripPrefix(1)
-                                .tokenRelay()
-                        )
-                        .uri("lb://NOTIFICATION-SERVICE"))
 
                 // ----------------------------------------------------
                 // 3. MICROSERVICIO DE CATÁLOGO Y EVENTOS
