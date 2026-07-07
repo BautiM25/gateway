@@ -11,24 +11,41 @@ public class SpringCloudConfig {
     @Bean
     public RouteLocator gatewayRoutes(RouteLocatorBuilder builder) {
         return builder.routes()
-                // Ruta para el Microservicio de Usuarios y Social
-                .route("user-service", r -> r.path("/api/auth/**", "/api/me/**", "/api/users/**")
+                // ----------------------------------------------------
+                // 1. MICROSERVICIO DE USUARIOS
+                // ----------------------------------------------------
+                .route("user-service", r -> r.path(
+                        "/api/admin/users/**", // AdminUserController
+                        "/api/auth/**",        // AuthController
+                        "/api/me/**"           // UserActionController
+                    )
                         .filters(f -> f
-                                .stripPrefix(1) // Quita el "/api"
-                                .tokenRelay()   // Pasa el token JWT de Keycloak al microservicio
+                                .stripPrefix(1)
+                                .tokenRelay()
                         )
                         .uri("lb://USER-SERVICE"))
 
-                // Ruta para el Microservicio de Notificaciones
-                .route("notification-service", r -> r.path("/api/notifications/**")
+                // ----------------------------------------------------
+                // 2. MICROSERVICIO DE NOTIFICACIONES
+                // ----------------------------------------------------
+                .route("notification-service", r -> r.path(
+                        "/api/notifications/**" // NotificationController
+                    )
                         .filters(f -> f
                                 .stripPrefix(1)
                                 .tokenRelay()
                         )
                         .uri("lb://NOTIFICATION-SERVICE"))
 
-                // Ruta para el Microservicio de Catálogo y Eventos
-                .route("catalog-event-service", r -> r.path("/api/events/**", "/api/artists/**", "/api/admin/**")
+                // ----------------------------------------------------
+                // 3. MICROSERVICIO DE CATÁLOGO Y EVENTOS
+                // ----------------------------------------------------
+                .route("catalog-event-service", r -> r.path(
+                        "/api/admin/artists/**", // ArtistController
+                        "/api/admin/events/**",  // EventController
+                        "/api/artists/**",       // PublicArtistController
+                        "/api/events/**"         // PublicEventController
+                    )
                         .filters(f -> f
                                 .stripPrefix(1)
                                 .tokenRelay()
